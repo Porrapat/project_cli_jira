@@ -12,7 +12,7 @@ fn main() {
     );
     println!("{:?}", sto.description);
 }
-
+// #[derive(Debug)]
 
     // let st = models::Epic {
     //     // id: 1,
