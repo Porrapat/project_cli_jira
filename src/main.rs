@@ -6,6 +6,7 @@ fn main() {
         "ddd".to_owned()
     );
     
+    println!("{:?}", st.description);
     let sto = Story::new(
         "name".to_string(),
         "description".to_string()
