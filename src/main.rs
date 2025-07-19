@@ -4,7 +4,7 @@ use serde_json;
 mod models;
 use models::{Epic, Story};
 
-// mod db;
+mod db;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct User {
@@ -30,3 +30,12 @@ fn main() {
     println!("{}", sto_json);
 }
 
+// use tempfile::NamedTempFile;
+// use std::io::Write;
+
+// fn main() -> std::io::Result<()> {
+//     let mut file = NamedTempFile::new()?;
+//     writeln!(file, "Hello, temp file!")?;
+//     println!("Temp file path: {:?}", file.path());
+//     Ok(())
+// }
