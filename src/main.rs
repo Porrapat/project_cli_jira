@@ -4,6 +4,8 @@ use serde_json;
 mod models;
 use models::{Epic, Story};
 
+mod db;
+
 #[derive(Serialize, Deserialize, Debug)]
 struct User {
     name: String,
