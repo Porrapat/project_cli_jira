@@ -13,7 +13,8 @@ pub struct Epic {
     // pub id: u32,
     pub name: String,
     pub description: String,
-    pub status: Status
+    pub status: Status,
+    // pub stories: Vec<Story>
 }
 
 impl Epic {
