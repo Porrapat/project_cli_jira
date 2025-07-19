@@ -11,7 +11,6 @@ struct User {
 }
 
 fn main() {
-
     let st = Epic::new(
         "aaa".to_owned(),
         "ddd".to_owned()
