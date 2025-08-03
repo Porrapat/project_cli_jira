@@ -18,16 +18,18 @@ fn main() -> Result<()> {
     // };
 
     // db.create_epic(epic1);
-    let x = db.create_story(Story {
-        name: "".to_owned(),
-        description: "".to_owned(),
-        status: Status::Open,
-    }, 122);
-    // println!("HHHHHH");
-    match x {
-        Ok(id) => println!("Id is {id}"),
-        Err(e) => println!("{}", e)
-    }
+    // let x = db.create_story(Story {
+    //     name: "".to_owned(),
+    //     description: "".to_owned(),
+    //     status: Status::Open,
+    // }, 122);
+    // // println!("HHHHHH");
+    // match x {
+    //     Ok(id) => println!("Id is {id}"),
+    //     Err(e) => println!("{}", e)
+    // }
+
+    db.delete_epic(123);
 
     Ok(())
 }
