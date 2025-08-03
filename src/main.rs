@@ -10,14 +10,24 @@ use crate::db::{JSONFileDatabase, Database, JiraDatabase};
 fn main() -> Result<()> {
     let db = JiraDatabase::new("db1.json".to_owned());
 
-    let epic1 = Epic {
-        name: "Example Epic xxx".to_string(),
-        description: "Testing epic xxx".to_string(),
-        status: Status::Open,
-        stories: vec![4,5],
-    };
+    // let epic1 = Epic {
+    //     name: "Example Epic xxx".to_string(),
+    //     description: "Testing epic xxx".to_string(),
+    //     status: Status::Open,
+    //     stories: vec![4,5],
+    // };
 
-    db.create_epic(epic1);
+    // db.create_epic(epic1);
+    let x = db.create_story(Story {
+        name: "".to_owned(),
+        description: "".to_owned(),
+        status: Status::Open,
+    }, 122);
+    // println!("HHHHHH");
+    match x {
+        Ok(id) => println!("Id is {id}"),
+        Err(e) => println!("{}", e)
+    }
 
     Ok(())
 }
