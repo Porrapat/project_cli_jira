@@ -5,14 +5,26 @@ use db::{JSONFileDatabase, Database}; // อย่าลืม `pub` ใน db.r
 use crate::models::{DBState, Epic, Story, Status};
 use std::collections::HashMap;
 use anyhow::Result;
-fn main() -> Result<()> {
-    let db = JSONFileDatabase { file_path: "db3.json".to_string() };
 
-    // // อ่านก่อน
-    // match db.read_db() {
-    //     Ok(data) => println!("✅ Loaded DB: {:?}", data),
-    //     Err(err) => println!("❌ Failed to read DB: {}", err),
-    // }
+fn seeding_db(filepath: &str) -> Result<()> {
+    // println!("{filepath}");
+
+    let db = JSONFileDatabase { file_path: filepath.to_owned() };
+    // let db = JSONFileDatabase { file_path: "db3.json".to_string() };
+
+    let mut last_item_id = 1;
+
+    let epic1 = Epic {
+        name: "Example Epic".to_string(),
+        description: "Testing epic".to_string(),
+        status: Status::Open,
+        stories: vec![2, 3],
+    };
+
+    let mut epics = HashMap::new();
+    epics.insert(last_item_id, epic1);
+
+    last_item_id = last_item_id + 1;
 
     let story1 = Story {
         name: "Example Story".to_string(),
@@ -20,21 +32,23 @@ fn main() -> Result<()> {
         status: Status::Open,
     };
 
-    let epic1 = Epic {
-        name: "Example Epic".to_string(),
-        description: "Testing epic".to_string(),
+    let story2 = Story {
+        name: "Example Story 2".to_string(),
+        description: "Just testing 2".to_string(),
         status: Status::Open,
-        stories: vec![1],
     };
 
-    let mut stories = HashMap::new();
-    stories.insert(1, story1);
 
-    let mut epics = HashMap::new();
-    epics.insert(1, epic1);
+
+    let mut stories = HashMap::new();
+    stories.insert(last_item_id, story1);
+    last_item_id = last_item_id + 1;
+    stories.insert(last_item_id, story2);
+    last_item_id = last_item_id + 1;
+
 
     let state = DBState {
-        last_item_id: 1,
+        last_item_id,
         epics,
         stories,
     };
@@ -45,6 +59,16 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+fn main() -> Result<()> {
+    seeding_db("db4.json")?;
+    Ok(())
+}
+
+// // อ่านก่อน
+// match db.read_db() {
+//     Ok(data) => println!("✅ Loaded DB: {:?}", data),
+//     Err(err) => println!("❌ Failed to read DB: {}", err),
+// }
 
 
 // use serde::{Serialize, Deserialize};
