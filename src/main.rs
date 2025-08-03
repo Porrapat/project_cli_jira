@@ -29,8 +29,10 @@ fn main() -> Result<()> {
     //     Err(e) => println!("{}", e)
     // }
 
-    db.delete_epic(123);
-
+    // db.delete_epic(123);
+    db.delete_story(111,222);
+    db.update_epic_status(12, Status::Closed);
+    db.update_story_status(1234, Status::InProgress);
     Ok(())
 }
 
