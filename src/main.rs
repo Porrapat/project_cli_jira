@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use anyhow::Result;
 
 fn seeding_db(filepath: &str) -> Result<()> {
-    // println!("{filepath}");
 
     let db = JSONFileDatabase { file_path: filepath.to_owned() };
     // let db = JSONFileDatabase { file_path: "db3.json".to_string() };
@@ -59,8 +58,17 @@ fn seeding_db(filepath: &str) -> Result<()> {
     Ok(())
 }
 
+fn connecting_db(filepath: &str) {
+    let db = JSONFileDatabase { file_path: filepath.to_owned() };
+    match db.read_db() {
+        Ok(data) => println!("✅ Loaded DB: {:?}", data),
+        Err(err) => println!("❌ Failed to read DB: {}", err),
+    }
+}
+
 fn main() -> Result<()> {
     seeding_db("db4.json")?;
+    connecting_db("db4.json");
     Ok(())
 }
 
