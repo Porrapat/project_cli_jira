@@ -10,9 +10,11 @@ pub struct JiraDatabase {
 }
 
 impl JiraDatabase {
-    // pub fn new(file_path: String) -> Self {
-    //     todo!()
-    // }
+    pub fn new(file_path: String) -> Self {
+        println!("Newing file");
+        // todo!()
+        JiraDatabase { database: "abc" }
+    }
 
     // pub fn new(file_path: String) -> Self {
     //     JiraDatabase {
