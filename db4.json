@@ -12,14 +12,14 @@
     }
   },
   "stories": {
-    "3": {
-      "name": "Example Story 2",
-      "description": "Just testing 2",
-      "status": "Open"
-    },
     "2": {
       "name": "Example Story",
       "description": "Just testing",
+      "status": "Open"
+    },
+    "3": {
+      "name": "Example Story 2",
+      "description": "Just testing 2",
       "status": "Open"
     }
   }
