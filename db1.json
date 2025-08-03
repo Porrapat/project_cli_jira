@@ -1,6 +1,15 @@
 {
-  "last_item_id": 3,
+  "last_item_id": 5,
   "epics": {
+    "5": {
+      "name": "Example Epic xxx",
+      "description": "Testing epic xxx",
+      "status": "Open",
+      "stories": [
+        4,
+        5
+      ]
+    },
     "1": {
       "name": "Epic - Project 1",
       "description": "This is Project 1 for the Bootcamp",
