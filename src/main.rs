@@ -7,13 +7,14 @@ use crate::utility::{seeding_db, connecting_db};
 use crate::db::{JSONFileDatabase, Database, JiraDatabase};
 
 fn main() -> Result<()> {
-
-    let db = JSONFileDatabase { file_path: "./data/db.json".to_owned() };
-    // let db = JSONFileDatabase { file_path: filepath.to_owned() };
-    match db.read_db() {
-        Ok(data) => println!("✅ Loaded DB: {:?}", data),
-        Err(err) => println!("❌ Failed to read DB: {}", err),
-    }
+    let db = JiraDatabase::new("db1.json".to_owned());
+    
+    // let db = JSONFileDatabase { file_path: "./data/db.json".to_owned() };
+    // // let db = JSONFileDatabase { file_path: filepath.to_owned() };
+    // match db.read_db() {
+    //     Ok(data) => println!("✅ Loaded DB: {:?}", data),
+    //     Err(err) => println!("❌ Failed to read DB: {}", err),
+    // }
 
     // db.
     // todo!("Not IMP");

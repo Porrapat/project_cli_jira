@@ -11,16 +11,10 @@ pub struct JiraDatabase {
 
 impl JiraDatabase {
     pub fn new(file_path: String) -> Self {
-        println!("Newing file");
-        // todo!()
-        JiraDatabase { database: "abc" }
+        Self {
+            database: Box::new(JSONFileDatabase { file_path })
+        }
     }
-
-    // pub fn new(file_path: String) -> Self {
-    //     JiraDatabase {
-    //         database: Box::new(JSONFileDatabase::new(file_path)),
-    //     }
-    // }
 
     pub fn read_db(&self) -> Result<DBState> {
         todo!()
