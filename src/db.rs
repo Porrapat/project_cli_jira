@@ -17,8 +17,15 @@ impl JiraDatabase {
     }
 
     pub fn read_db(&self) -> Result<DBState> {
-        todo!()
+        self.database.read_db()
     }
+
+    // pub fn read_db(&self) -> Result<DBState> {
+    //     self.database.read_db()
+    // }
+    // pub fn read_db(&self) -> Result<DBState> {
+    //     todo!()
+    // }
     
     pub fn create_epic(&self, epic: Epic) -> Result<u32> {
         todo!()

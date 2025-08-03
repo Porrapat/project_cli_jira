@@ -8,7 +8,7 @@ use crate::db::{JSONFileDatabase, Database, JiraDatabase};
 
 fn main() -> Result<()> {
     let db = JiraDatabase::new("db1.json".to_owned());
-    
+    db.read_db()?;
     // let db = JSONFileDatabase { file_path: "./data/db.json".to_owned() };
     // // let db = JSONFileDatabase { file_path: filepath.to_owned() };
     // match db.read_db() {
