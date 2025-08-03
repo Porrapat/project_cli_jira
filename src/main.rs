@@ -1,27 +1,26 @@
 mod db;
-mod models; // ถ้าอยู่คนละไฟล์
+mod models;
 
 use db::{JSONFileDatabase, Database}; // อย่าลืม `pub` ใน db.rs
 use crate::models::{DBState, Epic, Story, Status};
 use std::collections::HashMap;
+use anyhow::Result;
+fn main() -> Result<()> {
+    let db = JSONFileDatabase { file_path: "db3.json".to_string() };
 
-fn main() -> anyhow::Result<()> {
-    let db = JSONFileDatabase { file_path: "db2.json".to_string() };
+    // // อ่านก่อน
+    // match db.read_db() {
+    //     Ok(data) => println!("✅ Loaded DB: {:?}", data),
+    //     Err(err) => println!("❌ Failed to read DB: {}", err),
+    // }
 
-    // อ่านก่อน
-    match db.read_db() {
-        Ok(data) => println!("✅ Loaded DB: {:?}", data),
-        Err(err) => println!("❌ Failed to read DB: {}", err),
-    }
-
-    // เขียนตัวอย่างใหม่
-    let story = Story {
+    let story1 = Story {
         name: "Example Story".to_string(),
         description: "Just testing".to_string(),
         status: Status::Open,
     };
 
-    let epic = Epic {
+    let epic1 = Epic {
         name: "Example Epic".to_string(),
         description: "Testing epic".to_string(),
         status: Status::Open,
@@ -29,10 +28,10 @@ fn main() -> anyhow::Result<()> {
     };
 
     let mut stories = HashMap::new();
-    stories.insert(1, story);
+    stories.insert(1, story1);
 
     let mut epics = HashMap::new();
-    epics.insert(1, epic);
+    epics.insert(1, epic1);
 
     let state = DBState {
         last_item_id: 1,
