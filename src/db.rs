@@ -49,9 +49,6 @@ impl JiraDatabase {
     }
     
     pub fn delete_epic(&self, epic_id: u32) -> Result<()> {
-        // println!("delete epic");
-        // Ok(())
-        // todo!()
         let mut parsed = self.database.read_db()?;
     
         for story_id in &parsed.epics.get(&epic_id).ok_or_else(|| anyhow!("could not find epic in database!"))?.stories {
@@ -65,24 +62,25 @@ impl JiraDatabase {
     }
     
     pub fn delete_story(&self,epic_id: u32, story_id: u32) -> Result<()> {
-        // todo!()
-        // let mut parsed = self.database.read_db()?;
+        let mut parsed = self.database.read_db()?;
     
-        // let epic = parsed.epics.get_mut(&epic_id).ok_or_else(|| anyhow!("could not find epic in database!"))?;
+        let epic = parsed.epics.get_mut(&epic_id).ok_or_else(|| anyhow!("could not find epic in database!"))?;
     
-        // let story_index = epic.stories.iter().position(|id| id == &story_id).ok_or_else(|| anyhow!("story id not found in epic stories vector"))?;
-        // epic.stories.remove(story_index);
+        let story_index = epic.stories.iter().position(|id| id == &story_id).ok_or_else(|| anyhow!("story id not found in epic stories vector"))?;
+        epic.stories.remove(story_index);
     
-        // parsed.stories.remove(&story_id);
+        parsed.stories.remove(&story_id);
     
-        // self.database.write_db(&parsed)?;
-        println!("delete story");
+        self.database.write_db(&parsed)?;
         Ok(())
     }
     
     pub fn update_epic_status(&self, epic_id: u32, status: Status) -> Result<()> {
         // todo!()
         println!("update_epic_status");
+
+        let mut parsed = self.database.read_db()?;
+        self.database.write_db(&parsed)?;
         Ok(())
     }
     
@@ -90,6 +88,8 @@ impl JiraDatabase {
         // todo!()
         
         println!("update_story_status");
+        let mut parsed = self.database.read_db()?;
+        self.database.write_db(&parsed)?;
         Ok(())
     }
 }
