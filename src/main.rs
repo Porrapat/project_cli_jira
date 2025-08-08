@@ -9,6 +9,13 @@ use crate::db::{JSONFileDatabase, Database, JiraDatabase};
 
 fn main() -> Result<()> {
     let db = JiraDatabase::new("db1.json".to_owned());
+    // db.create_story(story, epic_id)
+
+    let x = db.create_story(Story {
+        name: "TTTT".to_owned(),
+        description: "PPPP".to_owned(),
+        status: Status::Open,
+    }, 1);
 
     // let epic1 = Epic {
     //     name: "Example Epic xxx".to_string(),
@@ -30,9 +37,9 @@ fn main() -> Result<()> {
     // }
 
     // db.delete_epic(123);
-    db.delete_story(111,222);
-    db.update_epic_status(12, Status::Closed);
-    db.update_story_status(1234, Status::InProgress);
+    // db.delete_story(111,222);
+    // db.update_epic_status(12, Status::Closed);
+    // db.update_story_status(1234, Status::InProgress);
     Ok(())
 }
 
