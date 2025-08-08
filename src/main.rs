@@ -11,16 +11,16 @@ fn main() -> Result<()> {
     let db = JiraDatabase::new("db1.json".to_owned());
     // db.create_story(story, epic_id)
 
-    let x = db.create_story(Story {
-        name: "TTTT".to_owned(),
-        description: "PPPP".to_owned(),
-        status: Status::Open,
-    }, 100);
+    // let x = db.create_story(Story {
+    //     name: "TTTT".to_owned(),
+    //     description: "PPPP".to_owned(),
+    //     status: Status::Open,
+    // }, 100);
 
-    match x {
-        Ok(story_id) => { println!("Story id {story_id}"); },
-        Err(e) => { println!("Err {e}"); }
-    }
+    // match x {
+    //     Ok(story_id) => { println!("Story id {story_id}"); },
+    //     Err(e) => { println!("Err {e}"); }
+    // }
 
     // let epic1 = Epic {
     //     name: "Example Epic xxx".to_string(),
@@ -29,7 +29,23 @@ fn main() -> Result<()> {
     //     stories: vec![4,5],
     // };
 
-    // db.create_epic(epic1);
+    // let x = db.create_epic(epic1);
+
+    // match x {
+    //     Ok(epic_id) => { println!("Epic id {epic_id} created"); },
+    //     Err(e) => { println!("Err {e}"); }
+    // }
+
+    let x: Result<u32> = Ok(11);
+    if let Ok(epic_id) = x {
+        println!("Epic deleted with id: {epic_id}");
+        db.delete_epic(epic_id);
+    } else {
+        println!("Failed to create epic");
+    }
+
+    // db.delete_epic(epic_id);
+
     // let x = db.create_story(Story {
     //     name: "".to_owned(),
     //     description: "".to_owned(),

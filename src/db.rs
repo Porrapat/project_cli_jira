@@ -50,18 +50,18 @@ impl JiraDatabase {
     
     pub fn delete_epic(&self, epic_id: u32) -> Result<()> {
         // println!("delete epic");
-        Ok(())
-        // todo!()
-        // let mut parsed = self.database.read_db()?;
-    
-        // for story_id in &parsed.epics.get(&epic_id).ok_or_else(|| anyhow!("could not find epic in database!"))?.stories {
-        //     parsed.stories.remove(story_id);
-        // }
-        
-        // parsed.epics.remove(&epic_id);
-    
-        // self.database.write_db(&parsed)?;
         // Ok(())
+        // todo!()
+        let mut parsed = self.database.read_db()?;
+    
+        for story_id in &parsed.epics.get(&epic_id).ok_or_else(|| anyhow!("could not find epic in database!"))?.stories {
+            parsed.stories.remove(story_id);
+        }
+        
+        parsed.epics.remove(&epic_id);
+    
+        self.database.write_db(&parsed)?;
+        Ok(())
     }
     
     pub fn delete_story(&self,epic_id: u32, story_id: u32) -> Result<()> {
