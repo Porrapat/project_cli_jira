@@ -15,7 +15,12 @@ fn main() -> Result<()> {
         name: "TTTT".to_owned(),
         description: "PPPP".to_owned(),
         status: Status::Open,
-    }, 1);
+    }, 100);
+
+    match x {
+        Ok(story_id) => { println!("Story id {story_id}"); },
+        Err(e) => { println!("Err {e}"); }
+    }
 
     // let epic1 = Epic {
     //     name: "Example Epic xxx".to_string(),

@@ -46,8 +46,6 @@ impl JiraDatabase {
         
         self.database.write_db(&parsed)?;
         Ok(epic_id)
-        // Ok(new_id)
-        // todo!()
     }
     
     pub fn delete_epic(&self, epic_id: u32) -> Result<()> {
