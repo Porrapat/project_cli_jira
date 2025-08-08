@@ -1,4 +1,18 @@
+    // let mock_db = MockDB::new();
+    // let result = mock_db.read_db(); // ได้ DBState ที่ว่างๆ
 
+    // let new_state = DBState {
+    //     last_item_id: 42,
+    //     epics: HashMap::new(),
+    //     stories: HashMap::new(),
+    // };
+
+    // mock_db.write_db(&new_state); // เขียนสถานะใหม่เข้าไป
+    // // let db = JiraDatabase::new("db1.json".to_owned());
+
+
+
+    
     // db.update_story_status(3, Status::Closed);
     // db.update_story_status(3, Status::InProgress);
     // db.update_epic_status(1, Status::InProgress);
