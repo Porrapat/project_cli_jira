@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 mod db;
 mod models;
 mod utility;
@@ -9,7 +11,11 @@ use crate::db::{JSONFileDatabase, Database, JiraDatabase};
 
 fn main() -> Result<()> {
     let db = JiraDatabase::new("db1.json".to_owned());
-    db.update_epic_status(1, Status::Closed);
+
+    // db.update_story_status(3, Status::Closed);
+    // db.update_story_status(3, Status::InProgress);
+    // db.update_epic_status(1, Status::InProgress);
+    // db.update_epic_status(1, Status::Closed);
     // db.create_story(story, epic_id)
 
     // let x = db.create_story(Story {

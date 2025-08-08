@@ -13,15 +13,15 @@
     }
   },
   "stories": {
-    "3": {
-      "name": "Story - Project 1 README",
-      "description": "Please create README file for Project 1",
-      "status": "InProgress"
-    },
     "2": {
       "name": "Story - Project 1 Solution",
       "description": "Please provide full implement for Project 1",
       "status": "Closed"
+    },
+    "3": {
+      "name": "Story - Project 1 README",
+      "description": "Please create README file for Project 1",
+      "status": "InProgress"
     },
     "7": {
       "name": "TTTT",

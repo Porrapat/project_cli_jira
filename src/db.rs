@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::fs;
 use serde_json;
 
@@ -76,21 +78,26 @@ impl JiraDatabase {
     }
     
     pub fn update_epic_status(&self, epic_id: u32, status: Status) -> Result<()> {
-        // todo!()
-        println!("update_epic_status");
-
         let mut parsed = self.database.read_db()?;
-        self.database.write_db(&parsed)?;
-        Ok(())
+        if let Some(epic) = parsed.epics.get_mut(&epic_id) {
+            epic.status = status;
+            self.database.write_db(&parsed)?;
+            Ok(())
+        } else {
+            Err(anyhow!("Epic with id {} not found", epic_id))
+        }
     }
     
     pub fn update_story_status(&self, story_id: u32, status: Status) -> Result<()> {
-        // todo!()
-        
-        println!("update_story_status");
         let mut parsed = self.database.read_db()?;
-        self.database.write_db(&parsed)?;
-        Ok(())
+
+        if let Some(story) = parsed.stories.get_mut(&story_id) {
+            story.status = status;
+            self.database.write_db(&parsed)?;
+            Ok(())
+        } else {
+            Err(anyhow!("Story with id {} not found", story_id))
+        }
     }
 }
 
