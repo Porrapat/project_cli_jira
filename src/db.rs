@@ -163,7 +163,6 @@ mod tests {
         let db = JiraDatabase { database: Box::new(MockDB::new()) };
         let epic = Epic::new("".to_owned(), "".to_owned());
 
-        // TODO: fix this error by deriving the appropriate traits for Epic
         let result = db.create_epic(epic.clone());
         
         assert_eq!(result.is_ok(), true);
@@ -200,7 +199,6 @@ mod tests {
 
         let epic_id = result.unwrap();
 
-        // TODO: fix this error by deriving the appropriate traits for Story
         let result = db.create_story(story.clone(), epic_id);
         assert_eq!(result.is_ok(), true);
 
@@ -453,7 +451,6 @@ mod tests {
             let read_result = db.read_db().unwrap();
 
             assert_eq!(write_result.is_ok(), true);
-            // TODO: fix this error by deriving the appropriate traits for DBState
             assert_eq!(read_result, state);
         }
     }
