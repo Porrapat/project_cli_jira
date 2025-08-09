@@ -24,7 +24,15 @@ impl Page for HomePage {
         println!("----------------------------- EPICS -----------------------------");
         println!("     id     |               name               |      status      ");
 
-        // TODO: print out epics using get_column_string(). also make sure the epics are sorted by id
+        let epics = self.db.read_db()?.epics;
+
+        for id in epics.keys().sorted() {
+            let epic = &epics[id];
+            let id_col = get_column_string(&id.to_string(), 11);
+            let name_col = get_column_string(&epic.name, 32);
+            let status_col = get_column_string(&epic.status.to_string(), 17);
+            println!("{} | {} | {}", id_col, name_col, status_col);
+        }
 
         println!();
         println!();
@@ -38,8 +46,6 @@ impl Page for HomePage {
         todo!() // match against the user input and return the corresponding action. If the user input was invalid return None.
     }
 }
-
-/*
 
 pub struct EpicDetail {
     pub epic_id: u32,
@@ -107,6 +113,7 @@ impl Page for StoryDetail {
     }
 }
 
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
