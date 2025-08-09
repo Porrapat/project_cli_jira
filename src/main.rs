@@ -21,14 +21,15 @@ use crate::ui::Page;
 
 fn main() -> Result<()> {
 
-    println!("สวัสดีโปรแกรมของผม");
-    println!("======================");
-    // use std::rc::Rc;
+    // println!("สวัสดีโปรแกรมของผม");
+    // println!("======================");
+    use std::rc::Rc;
 
-    // let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
-    // let home_page = HomePage { db };
+    let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
+    let home_page = HomePage { db };
 
-    // home_page.draw_page()?;
+    home_page.draw_page()?;
+    home_page.handle_input("q")?;
 
     // let epic_detail_page = EpicDetail { epic_id: 1, db };
 
