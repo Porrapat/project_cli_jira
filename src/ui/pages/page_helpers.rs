@@ -1,8 +1,12 @@
 use ellipse::Ellipse;
 
 pub fn get_column_string(text: &str, width: usize) -> String {
-    todo!() // use the truncate_ellipse function from the ellipse crate
+    // println!("hello");
+    String::from("")
+    // todo!() // use the truncate_ellipse function from the ellipse crate
 }
+
+// cargo test test_get_column_string
 
 #[cfg(test)]
 mod tests {
