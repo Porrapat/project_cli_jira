@@ -20,9 +20,11 @@ use crate::ui::HomePage;
 use crate::ui::Page;
 
 fn main() -> Result<()> {
-    use std::rc::Rc;
 
-    let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
+    println!("Hello World Test Program");
+    // use std::rc::Rc;
+
+    // let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
     // let home_page = HomePage { db };
 
     // home_page.draw_page()?;
@@ -31,9 +33,9 @@ fn main() -> Result<()> {
 
     // epic_detail_page.draw_page()?;
 
-    let story_detail_page = StoryDetail { story_id: 2, epic_id: 1, db };
+    // let story_detail_page = StoryDetail { story_id: 2, epic_id: 1, db };
 
-    story_detail_page.draw_page()?;
+    // story_detail_page.draw_page()?;
 
     Ok(())
 }
