@@ -21,11 +21,11 @@ use crate::ui::Page;
 
 fn main() -> Result<()> {
 
-    // println!("สวัสดีโปรแกรมของผม");
-    // println!("======================");
-    use std::rc::Rc;
+    println!("สวัสดีโปรแกรมของผม");
+    println!("======================");
+    // use std::rc::Rc;
 
-    let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
+    // let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
     // let home_page = HomePage { db };
 
     // home_page.draw_page()?;
@@ -44,12 +44,12 @@ fn main() -> Result<()> {
 
     // println!("{ret:?}");
 
-    let story_detail_page = StoryDetail { story_id: 2, epic_id: 1, db };
+    // let story_detail_page = StoryDetail { story_id: 2, epic_id: 1, db };
 
-    story_detail_page.draw_page()?;
-    let ret = story_detail_page.handle_input("d")?;
+    // story_detail_page.draw_page()?;
+    // let ret = story_detail_page.handle_input("d")?;
 
-    println!("{ret:?}");
+    // println!("{ret:?}");
 
     Ok(())
 }
