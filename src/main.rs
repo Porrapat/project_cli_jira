@@ -3,7 +3,7 @@
 mod db;
 mod models;
 mod utility;
-// mod ui;
+mod ui;
 
 use anyhow::Result;
 use crate::models::{DBState, Epic, Story, Status};
