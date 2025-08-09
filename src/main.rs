@@ -29,7 +29,13 @@ fn main() -> Result<()> {
     let home_page = HomePage { db };
 
     home_page.draw_page()?;
-    home_page.handle_input("q")?;
+    // let ret = home_page.handle_input("c");
+    let ret = home_page.handle_input("c")?;
+
+    println!("{ret:?}");
+    // match re {
+
+    // }
 
     // let epic_detail_page = EpicDetail { epic_id: 1, db };
 
