@@ -21,7 +21,8 @@ use crate::ui::Page;
 
 fn main() -> Result<()> {
 
-    println!("Hello World Test Program");
+    println!("สวัสดีโปรแกรมของผม");
+    println!("======================");
     // use std::rc::Rc;
 
     // let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
