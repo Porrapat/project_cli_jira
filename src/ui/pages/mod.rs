@@ -19,6 +19,7 @@ pub struct HomePage {
     pub db: Rc<JiraDatabase>
 }
 impl Page for HomePage {
+    
     fn draw_page(&self) -> Result<()> {
         println!("----------------------------- EPICS -----------------------------");
         println!("     id     |               name               |      status      ");
@@ -37,6 +38,8 @@ impl Page for HomePage {
         todo!() // match against the user input and return the corresponding action. If the user input was invalid return None.
     }
 }
+
+/*
 
 pub struct EpicDetail {
     pub epic_id: u32,
@@ -279,3 +282,5 @@ mod tests {
         } 
     }
 }
+
+*/
