@@ -26,13 +26,13 @@ fn main() -> Result<()> {
     use std::rc::Rc;
 
     let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
-    let home_page = HomePage { db };
+    // let home_page = HomePage { db };
 
-    home_page.draw_page()?;
-    // let ret = home_page.handle_input("c");
-    let ret = home_page.handle_input("c")?;
+    // home_page.draw_page()?;
+    // // let ret = home_page.handle_input("c");
+    // let ret = home_page.handle_input("c")?;
 
-    println!("{ret:?}");
+    // println!("{ret:?}");
     // match re {
 
     // }
@@ -40,10 +40,16 @@ fn main() -> Result<()> {
     // let epic_detail_page = EpicDetail { epic_id: 1, db };
 
     // epic_detail_page.draw_page()?;
+    // let ret = epic_detail_page.handle_input("u")?;
 
-    // let story_detail_page = StoryDetail { story_id: 2, epic_id: 1, db };
+    // println!("{ret:?}");
 
-    // story_detail_page.draw_page()?;
+    let story_detail_page = StoryDetail { story_id: 2, epic_id: 1, db };
+
+    story_detail_page.draw_page()?;
+    let ret = story_detail_page.handle_input("d")?;
+
+    println!("{ret:?}");
 
     Ok(())
 }
