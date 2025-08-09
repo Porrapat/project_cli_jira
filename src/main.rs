@@ -20,10 +20,14 @@ use crate::ui::EpicDetail;
 use crate::ui::HomePage;
 use crate::ui::Page;
 
+use crate::io_utils::get_user_input;
+
 fn main() -> Result<()> {
 
     println!("สวัสดีโปรแกรมของผม");
     println!("======================");
+    let s = get_user_input();
+    println!("{s}");
     // use std::rc::Rc;
 
     // let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
