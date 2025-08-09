@@ -5,6 +5,7 @@ mod models;
 mod utility;
 mod ui;
 mod io_utils;
+// mod navigator;
 
 use anyhow::Result;
 use crate::models::{DBState, Epic, Story, Status};
@@ -26,8 +27,8 @@ fn main() -> Result<()> {
 
     println!("สวัสดีโปรแกรมของผม");
     println!("======================");
-    let s = get_user_input();
-    println!("{s}");
+    // let s = get_user_input();
+    // println!("{s}");
     // use std::rc::Rc;
 
     // let db = Rc::new(JiraDatabase::new("db1.json".to_owned())); // หรือใส่ mock data ไปเลย
