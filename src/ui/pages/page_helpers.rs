@@ -1,43 +1,30 @@
 use ellipse::Ellipse;
 
 pub fn get_column_string(text: &str, width: usize) -> String {
-    match text {
-        ""=> {
-            match width {
-                6 => "      ".to_owned(),
-                _ => text.to_owned()
-            }
-        },
-        "test" => {
-            match width {
-                6 => "test  ".to_owned(),
-                _ => text.to_owned()
-            }
-        },
-        "testme" => {
-            match width {
-                6 => "testme".to_owned(),
-                _ => text.to_owned()
-            }
-        },
-        "testmetest" => {
-            match width {
-                0 => "".to_owned(),
-                1 => ".".to_owned(),
-                2 => "..".to_owned(),
-                3 => "...".to_owned(),
-                4 => "t...".to_owned(),
-                6 => "tes...".to_owned(),
-                _ => "".to_owned(),
-            }
-        },
-        _ => {
-            String::from("")
+    let len = text.len();
+    if len < width {
+        let left_over = width - len;
+        let mut column_string = text.to_owned();
+        for _ in 0..left_over {
+            column_string.push(' ');
         }
+        column_string
+    } else if len == width {
+        text.to_owned()
+    } else {
+        if width == 0 {
+            return "".to_owned();
+        } else if width == 1 {
+            return ".".to_owned();
+        } else if width == 2 {
+            return "..".to_owned();
+        } else if width == 3 {
+            return "...".to_owned();
+        }
+        let result = text.truncate_ellipse(width-3);
+        result.to_string()
     }
 }
-
-// cargo test test_get_column_string
 
 #[cfg(test)]
 mod tests {
