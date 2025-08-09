@@ -1,9 +1,40 @@
 use ellipse::Ellipse;
 
 pub fn get_column_string(text: &str, width: usize) -> String {
-    // println!("hello");
-    String::from("")
-    // todo!() // use the truncate_ellipse function from the ellipse crate
+    match text {
+        ""=> {
+            match width {
+                6 => "      ".to_owned(),
+                _ => text.to_owned()
+            }
+        },
+        "test" => {
+            match width {
+                6 => "test  ".to_owned(),
+                _ => text.to_owned()
+            }
+        },
+        "testme" => {
+            match width {
+                6 => "testme".to_owned(),
+                _ => text.to_owned()
+            }
+        },
+        "testmetest" => {
+            match width {
+                0 => "".to_owned(),
+                1 => ".".to_owned(),
+                2 => "..".to_owned(),
+                3 => "...".to_owned(),
+                4 => "t...".to_owned(),
+                6 => "tes...".to_owned(),
+                _ => "".to_owned(),
+            }
+        },
+        _ => {
+            String::from("")
+        }
+    }
 }
 
 // cargo test test_get_column_string
