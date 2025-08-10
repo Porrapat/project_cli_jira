@@ -23,10 +23,25 @@ use crate::ui::Page;
 
 use crate::io_utils::get_user_input;
 
+use std::rc::Rc;
+use navigator::*;
+
 fn main() -> Result<()> {
 
     println!("สวัสดีโปรแกรมของผม");
     println!("======================");
+
+    loop {
+        clearscreen::clear().unwrap();
+
+        // TODO: implement the following functionality:
+        // 1. get current page from navigator. If there is no current page exit the loop.
+        // 2. render page
+        // 3. get user input
+        // 4. pass input to page's input handler
+        // 5. if the page's input handler returns an action let the navigator process the action
+    }
+    
     // let s = get_user_input();
     // println!("{s}");
     // use std::rc::Rc;
