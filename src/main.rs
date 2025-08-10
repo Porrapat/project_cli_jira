@@ -5,7 +5,7 @@ mod models;
 mod utility;
 mod ui;
 mod io_utils;
-// mod navigator;
+mod navigator;
 
 use anyhow::Result;
 use crate::models::{DBState, Epic, Story, Status};
