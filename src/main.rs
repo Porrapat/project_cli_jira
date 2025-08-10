@@ -29,8 +29,18 @@ use navigator::*;
 
 fn main() -> Result<()> {
 
-    let db = Rc::new(JiraDatabase::new("./data/db.json".to_owned()));
+    // let db = Rc::new(JiraDatabase::new("./data/db.json".to_owned()));
+    let db = Rc::new(JiraDatabase::new("./db1.json".to_owned()));
     let mut navigator = Navigator::new(Rc::clone(&db));
+
+    // clearscreen::clear().unwrap();
+    // println!("====== START Program =====");
+    // wait_for_key_press();
+    // clearscreen::clear().unwrap();
+
+    // println!("====== Help =====");
+    // wait_for_key_press();
+    // clearscreen::clear().unwrap();
 
     loop {
         clearscreen::clear().unwrap();
