@@ -10,6 +10,7 @@ serde_json = "1.0.142"
 clearscreen = "4.0.2"
 ellipse = "0.2.0"
 itertools = "0.14.0"
+rusqlite = { version = "0.32.1", features = ["bundled"] }
 
 [dev-dependencies]
 tempfile = "3.3.0"

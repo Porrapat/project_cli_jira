@@ -30,7 +30,8 @@ use navigator::*;
 fn main() -> Result<()> {
 
     // let db = Rc::new(JiraDatabase::new("./data/db.json".to_owned()));
-    let db = Rc::new(JiraDatabase::new("./db1.json".to_owned()));
+    // let db = Rc::new(JiraDatabase::new("./db1.json".to_owned()));
+    let db = Rc::new(JiraDatabase::new_sqlite("./data/jira.db".to_owned())?);
     let mut navigator = Navigator::new(Rc::clone(&db));
 
     // clearscreen::clear().unwrap();
@@ -79,4 +80,3 @@ fn main() -> Result<()> {
     }
     Ok(())
 }
-

@@ -2,9 +2,11 @@
 
 use std::fs;
 use serde_json;
+use std::collections::HashMap;
 
 use anyhow::Result;
 use anyhow::anyhow;
+use rusqlite::{Connection, params};
 
 use crate::models::{DBState, Epic, Story, Status};
 
@@ -17,6 +19,12 @@ impl JiraDatabase {
         Self {
             database: Box::new(JSONFileDatabase { file_path })
         }
+    }
+
+    pub fn new_sqlite(file_path: String) -> Result<Self> {
+        Ok(Self {
+            database: Box::new(SQLiteDatabase::new(file_path)?)
+        })
     }
 
     pub fn read_db(&self) -> Result<DBState> {
@@ -149,6 +157,184 @@ impl Database for JSONFileDatabase {
     fn write_db(&self, db_state: &DBState) -> Result<()> {
         let content = serde_json::to_string_pretty(db_state)?;
         fs::write(&self.file_path, content)?;
+        Ok(())
+    }
+}
+
+pub struct SQLiteDatabase {
+    pub file_path: String
+}
+
+impl SQLiteDatabase {
+    pub fn new(file_path: String) -> Result<Self> {
+        let db = Self { file_path };
+        db.init_tables()?;
+        Ok(db)
+    }
+
+    fn init_tables(&self) -> Result<()> {
+        let conn = Connection::open(&self.file_path)?;
+        
+        // Create tables
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS metadata (
+                key TEXT PRIMARY KEY,
+                value INTEGER NOT NULL
+            )",
+            [],
+        )?;
+
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS epics (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                status TEXT NOT NULL
+            )",
+            [],
+        )?;
+
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS stories (
+                id INTEGER PRIMARY KEY,
+                epic_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                status TEXT NOT NULL,
+                FOREIGN KEY(epic_id) REFERENCES epics(id)
+            )",
+            [],
+        )?;
+
+        // Initialize last_item_id if it doesn't exist
+        conn.execute(
+            "INSERT OR IGNORE INTO metadata (key, value) VALUES ('last_item_id', 0)",
+            [],
+        )?;
+
+        Ok(())
+    }
+
+    fn status_to_string(status: &Status) -> String {
+        match status {
+            Status::Open => "Open".to_string(),
+            Status::InProgress => "InProgress".to_string(),
+            Status::Resolved => "Resolved".to_string(),
+            Status::Closed => "Closed".to_string(),
+        }
+    }
+
+    fn string_to_status(status_str: &str) -> Result<Status> {
+        match status_str {
+            "Open" => Ok(Status::Open),
+            "InProgress" => Ok(Status::InProgress),
+            "Resolved" => Ok(Status::Resolved),
+            "Closed" => Ok(Status::Closed),
+            _ => Err(anyhow!("Invalid status: {}", status_str)),
+        }
+    }
+}
+
+impl Database for SQLiteDatabase {
+    fn read_db(&self) -> Result<DBState> {
+        let conn = Connection::open(&self.file_path)?;
+        
+        // Get last_item_id
+        let last_item_id: u32 = conn.query_row(
+            "SELECT value FROM metadata WHERE key = 'last_item_id'",
+            [],
+            |row| row.get(0)
+        )?;
+
+        // Get all epics
+        let mut epics = HashMap::new();
+        let mut stmt = conn.prepare("SELECT id, name, description, status FROM epics")?;
+        let epic_rows = stmt.query_map([], |row| {
+            let id: u32 = row.get(0)?;
+            let name: String = row.get(1)?;
+            let description: String = row.get(2)?;
+            let status_str: String = row.get(3)?;
+            let status = Self::string_to_status(&status_str).map_err(|e| rusqlite::Error::InvalidColumnType(0, "status".to_string(), rusqlite::types::Type::Text))?;
+            
+            Ok((id, Epic { name, description, status, stories: Vec::new() }))
+        })?;
+
+        for epic_row in epic_rows {
+            let (id, epic) = epic_row?;
+            epics.insert(id, epic);
+        }
+
+        // Get all stories and associate them with epics
+        let mut stories = HashMap::new();
+        let mut stmt = conn.prepare("SELECT id, epic_id, name, description, status FROM stories")?;
+        let story_rows = stmt.query_map([], |row| {
+            let id: u32 = row.get(0)?;
+            let epic_id: u32 = row.get(1)?;
+            let name: String = row.get(2)?;
+            let description: String = row.get(3)?;
+            let status_str: String = row.get(4)?;
+            let status = Self::string_to_status(&status_str).map_err(|e| rusqlite::Error::InvalidColumnType(0, "status".to_string(), rusqlite::types::Type::Text))?;
+            
+            Ok((id, epic_id, Story { name, description, status }))
+        })?;
+
+        for story_row in story_rows {
+            let (story_id, epic_id, story) = story_row?;
+            stories.insert(story_id, story);
+            
+            // Add story ID to the epic's stories vector
+            if let Some(epic) = epics.get_mut(&epic_id) {
+                epic.stories.push(story_id);
+            }
+        }
+
+        Ok(DBState {
+            last_item_id,
+            epics,
+            stories,
+        })
+    }
+
+    fn write_db(&self, db_state: &DBState) -> Result<()> {
+        let conn = Connection::open(&self.file_path)?;
+        
+        // Start transaction
+        let tx = conn.unchecked_transaction()?;
+
+        // Update last_item_id
+        tx.execute(
+            "UPDATE metadata SET value = ?1 WHERE key = 'last_item_id'",
+            params![db_state.last_item_id],
+        )?;
+
+        // Clear existing data
+        tx.execute("DELETE FROM stories", [])?;
+        tx.execute("DELETE FROM epics", [])?;
+
+        // Insert epics
+        for (epic_id, epic) in &db_state.epics {
+            tx.execute(
+                "INSERT INTO epics (id, name, description, status) VALUES (?1, ?2, ?3, ?4)",
+                params![epic_id, epic.name, epic.description, Self::status_to_string(&epic.status)],
+            )?;
+        }
+
+        // Insert stories
+        for (story_id, story) in &db_state.stories {
+            // Find which epic this story belongs to
+            let epic_id = db_state.epics.iter()
+                .find(|(_, epic)| epic.stories.contains(story_id))
+                .map(|(id, _)| *id)
+                .ok_or_else(|| anyhow!("Story {} not found in any epic", story_id))?;
+
+            tx.execute(
+                "INSERT INTO stories (id, epic_id, name, description, status) VALUES (?1, ?2, ?3, ?4, ?5)",
+                params![story_id, epic_id, story.name, story.description, Self::status_to_string(&story.status)],
+            )?;
+        }
+
+        // Commit transaction
+        tx.commit()?;
         Ok(())
     }
 }
