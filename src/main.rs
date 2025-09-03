@@ -27,11 +27,12 @@ use crate::io_utils::wait_for_key_press;
 use std::rc::Rc;
 use navigator::*;
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
 
     // let db = Rc::new(JiraDatabase::new("./data/db.json".to_owned()));
     // let db = Rc::new(JiraDatabase::new("./db1.json".to_owned()));
-    let db = Rc::new(JiraDatabase::new_sqlite("./data/jira.db".to_owned())?);
+    let db = Rc::new(JiraDatabase::new_sqlite("./data/jira.db".to_owned()).await?);
     let mut navigator = Navigator::new(Rc::clone(&db));
 
     // clearscreen::clear().unwrap();

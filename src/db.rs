@@ -6,7 +6,8 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use anyhow::anyhow;
-use rusqlite::{Connection, params};
+use sqlx::{SqlitePool, Row};
+use futures::executor;
 
 use crate::models::{DBState, Epic, Story, Status};
 
@@ -21,9 +22,9 @@ impl JiraDatabase {
         }
     }
 
-    pub fn new_sqlite(file_path: String) -> Result<Self> {
+    pub async fn new_sqlite(file_path: String) -> Result<Self> {
         Ok(Self {
-            database: Box::new(SQLiteDatabase::new(file_path)?)
+            database: Box::new(SQLiteDatabase::new(file_path).await?)
         })
     }
 
@@ -162,39 +163,42 @@ impl Database for JSONFileDatabase {
 }
 
 pub struct SQLiteDatabase {
-    pub file_path: String
+    pool: SqlitePool,
 }
 
 impl SQLiteDatabase {
-    pub fn new(file_path: String) -> Result<Self> {
-        let db = Self { file_path };
-        db.init_tables()?;
+    pub async fn new(file_path: String) -> Result<Self> {
+        let database_url = format!("sqlite:{}", file_path);
+        let pool = SqlitePool::connect(&database_url).await?;
+        
+        let db = Self { pool };
+        db.init_tables().await?;
         Ok(db)
     }
 
-    fn init_tables(&self) -> Result<()> {
-        let conn = Connection::open(&self.file_path)?;
-        
+    async fn init_tables(&self) -> Result<()> {
         // Create tables
-        conn.execute(
+        sqlx::query(
             "CREATE TABLE IF NOT EXISTS metadata (
                 key TEXT PRIMARY KEY,
                 value INTEGER NOT NULL
-            )",
-            [],
-        )?;
+            )"
+        )
+        .execute(&self.pool)
+        .await?;
 
-        conn.execute(
+        sqlx::query(
             "CREATE TABLE IF NOT EXISTS epics (
                 id INTEGER PRIMARY KEY,
                 name TEXT NOT NULL,
                 description TEXT NOT NULL,
                 status TEXT NOT NULL
-            )",
-            [],
-        )?;
+            )"
+        )
+        .execute(&self.pool)
+        .await?;
 
-        conn.execute(
+        sqlx::query(
             "CREATE TABLE IF NOT EXISTS stories (
                 id INTEGER PRIMARY KEY,
                 epic_id INTEGER NOT NULL,
@@ -202,15 +206,15 @@ impl SQLiteDatabase {
                 description TEXT NOT NULL,
                 status TEXT NOT NULL,
                 FOREIGN KEY(epic_id) REFERENCES epics(id)
-            )",
-            [],
-        )?;
+            )"
+        )
+        .execute(&self.pool)
+        .await?;
 
         // Initialize last_item_id if it doesn't exist
-        conn.execute(
-            "INSERT OR IGNORE INTO metadata (key, value) VALUES ('last_item_id', 0)",
-            [],
-        )?;
+        sqlx::query("INSERT OR IGNORE INTO metadata (key, value) VALUES ('last_item_id', 0)")
+            .execute(&self.pool)
+            .await?;
 
         Ok(())
     }
@@ -233,90 +237,80 @@ impl SQLiteDatabase {
             _ => Err(anyhow!("Invalid status: {}", status_str)),
         }
     }
-}
 
-impl Database for SQLiteDatabase {
-    fn read_db(&self) -> Result<DBState> {
-        let conn = Connection::open(&self.file_path)?;
-        
+    async fn read_db_async(&self) -> Result<DBState> {
         // Get last_item_id
-        let last_item_id: u32 = conn.query_row(
-            "SELECT value FROM metadata WHERE key = 'last_item_id'",
-            [],
-            |row| row.get(0)
-        )?;
+        let last_item_id: i64 = sqlx::query_scalar("SELECT value FROM metadata WHERE key = 'last_item_id'")
+            .fetch_one(&self.pool)
+            .await?;
 
         // Get all epics
         let mut epics = HashMap::new();
-        let mut stmt = conn.prepare("SELECT id, name, description, status FROM epics")?;
-        let epic_rows = stmt.query_map([], |row| {
-            let id: u32 = row.get(0)?;
-            let name: String = row.get(1)?;
-            let description: String = row.get(2)?;
-            let status_str: String = row.get(3)?;
-            let status = Self::string_to_status(&status_str).map_err(|e| rusqlite::Error::InvalidColumnType(0, "status".to_string(), rusqlite::types::Type::Text))?;
-            
-            Ok((id, Epic { name, description, status, stories: Vec::new() }))
-        })?;
+        let epic_rows = sqlx::query("SELECT id, name, description, status FROM epics")
+            .fetch_all(&self.pool)
+            .await?;
 
-        for epic_row in epic_rows {
-            let (id, epic) = epic_row?;
-            epics.insert(id, epic);
+        for row in epic_rows {
+            let id: i64 = row.get("id");
+            let name: String = row.get("name");
+            let description: String = row.get("description");
+            let status_str: String = row.get("status");
+            let status = Self::string_to_status(&status_str)?;
+            
+            epics.insert(id as u32, Epic { name, description, status, stories: Vec::new() });
         }
 
         // Get all stories and associate them with epics
         let mut stories = HashMap::new();
-        let mut stmt = conn.prepare("SELECT id, epic_id, name, description, status FROM stories")?;
-        let story_rows = stmt.query_map([], |row| {
-            let id: u32 = row.get(0)?;
-            let epic_id: u32 = row.get(1)?;
-            let name: String = row.get(2)?;
-            let description: String = row.get(3)?;
-            let status_str: String = row.get(4)?;
-            let status = Self::string_to_status(&status_str).map_err(|e| rusqlite::Error::InvalidColumnType(0, "status".to_string(), rusqlite::types::Type::Text))?;
-            
-            Ok((id, epic_id, Story { name, description, status }))
-        })?;
+        let story_rows = sqlx::query("SELECT id, epic_id, name, description, status FROM stories")
+            .fetch_all(&self.pool)
+            .await?;
 
-        for story_row in story_rows {
-            let (story_id, epic_id, story) = story_row?;
-            stories.insert(story_id, story);
+        for row in story_rows {
+            let id: i64 = row.get("id");
+            let epic_id: i64 = row.get("epic_id");
+            let name: String = row.get("name");
+            let description: String = row.get("description");
+            let status_str: String = row.get("status");
+            let status = Self::string_to_status(&status_str)?;
+            
+            stories.insert(id as u32, Story { name, description, status });
             
             // Add story ID to the epic's stories vector
-            if let Some(epic) = epics.get_mut(&epic_id) {
-                epic.stories.push(story_id);
+            if let Some(epic) = epics.get_mut(&(epic_id as u32)) {
+                epic.stories.push(id as u32);
             }
         }
 
         Ok(DBState {
-            last_item_id,
+            last_item_id: last_item_id as u32,
             epics,
             stories,
         })
     }
 
-    fn write_db(&self, db_state: &DBState) -> Result<()> {
-        let conn = Connection::open(&self.file_path)?;
-        
-        // Start transaction
-        let tx = conn.unchecked_transaction()?;
+    async fn write_db_async(&self, db_state: &DBState) -> Result<()> {
+        let mut tx = self.pool.begin().await?;
 
         // Update last_item_id
-        tx.execute(
-            "UPDATE metadata SET value = ?1 WHERE key = 'last_item_id'",
-            params![db_state.last_item_id],
-        )?;
+        sqlx::query("UPDATE metadata SET value = $1 WHERE key = 'last_item_id'")
+            .bind(db_state.last_item_id as i64)
+            .execute(&mut *tx)
+            .await?;
 
         // Clear existing data
-        tx.execute("DELETE FROM stories", [])?;
-        tx.execute("DELETE FROM epics", [])?;
+        sqlx::query("DELETE FROM stories").execute(&mut *tx).await?;
+        sqlx::query("DELETE FROM epics").execute(&mut *tx).await?;
 
         // Insert epics
         for (epic_id, epic) in &db_state.epics {
-            tx.execute(
-                "INSERT INTO epics (id, name, description, status) VALUES (?1, ?2, ?3, ?4)",
-                params![epic_id, epic.name, epic.description, Self::status_to_string(&epic.status)],
-            )?;
+            sqlx::query("INSERT INTO epics (id, name, description, status) VALUES ($1, $2, $3, $4)")
+                .bind(*epic_id as i64)
+                .bind(&epic.name)
+                .bind(&epic.description)
+                .bind(Self::status_to_string(&epic.status))
+                .execute(&mut *tx)
+                .await?;
         }
 
         // Insert stories
@@ -327,15 +321,33 @@ impl Database for SQLiteDatabase {
                 .map(|(id, _)| *id)
                 .ok_or_else(|| anyhow!("Story {} not found in any epic", story_id))?;
 
-            tx.execute(
-                "INSERT INTO stories (id, epic_id, name, description, status) VALUES (?1, ?2, ?3, ?4, ?5)",
-                params![story_id, epic_id, story.name, story.description, Self::status_to_string(&story.status)],
-            )?;
+            sqlx::query("INSERT INTO stories (id, epic_id, name, description, status) VALUES ($1, $2, $3, $4, $5)")
+                .bind(*story_id as i64)
+                .bind(epic_id as i64)
+                .bind(&story.name)
+                .bind(&story.description)
+                .bind(Self::status_to_string(&story.status))
+                .execute(&mut *tx)
+                .await?;
         }
 
         // Commit transaction
-        tx.commit()?;
+        tx.commit().await?;
         Ok(())
+    }
+}
+
+impl Database for SQLiteDatabase {
+    fn read_db(&self) -> Result<DBState> {
+        // Since we need to use async functions but the trait is sync,
+        // we use futures::executor::block_on which works within async contexts
+        executor::block_on(self.read_db_async())
+    }
+
+    fn write_db(&self, db_state: &DBState) -> Result<()> {
+        // Since we need to use async functions but the trait is sync,
+        // we use futures::executor::block_on which works within async contexts
+        executor::block_on(self.write_db_async(db_state))
     }
 }
 
